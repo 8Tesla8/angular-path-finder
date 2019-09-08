@@ -136,19 +136,19 @@ export class PathFinder {
     let pathEnd = null;
 
     let stop = false;
-    for (let column = 0; column < field.maxColumn() && !stop; column++) {
-      for (let row = 0; row < field.maxRow() && !stop; row++) {
-        const element = field.getValue(column, row);
+    for (let row = 0; row < field.maxRow() && !stop; row++) {
+      for (let column = 0; column < field.maxColumn() && !stop; column++) {
+        const element = field.getValue(row, column);
 
         if (element === startSymbol) {
           pathStart = {
-            column: column,
-            row: row
+            row: row,
+            column: column
           } as Coordinates;
         } else if (element === endSymbol) {
           pathEnd = {
-            column: column,
-            row: row
+            row: row,
+            column: column
           } as Coordinates;
         }
 
@@ -167,10 +167,9 @@ export class PathFinder {
   private whereCanGo(field: Field, coord: Coordinates): Coordinates[] {
     let coordinates = [];
 
-    //top
     if (
       coord.column - 1 >= field.minColumn() &&
-      this.checkCoord(field, coord.column - 1, coord.row) 
+      this.checkCoord(field, coord.row, coord.column - 1) 
     ) {
         coordinates.push({
           column: coord.column - 1,
@@ -178,10 +177,9 @@ export class PathFinder {
         });
     }
 
-    //down
     if (
       coord.column + 1 < field.maxColumn() &&
-      this.checkCoord(field, coord.column + 1, coord.row)
+      this.checkCoord(field, coord.row, coord.column + 1)
     ) {
       coordinates.push({
         column: coord.column + 1,
@@ -189,10 +187,9 @@ export class PathFinder {
       });
     }
 
-    //left
     if (
       coord.row - 1 >= field.minRow() &&
-      this.checkCoord(field, coord.column, coord.row - 1) 
+      this.checkCoord(field, coord.row - 1, coord.column) 
     ) {
       coordinates.push({
         column: coord.column,
@@ -200,10 +197,9 @@ export class PathFinder {
       });
     }
 
-    //right
     if (
       coord.row + 1 < field.maxRow() &&
-      this.checkCoord(field, coord.column, coord.row + 1)
+      this.checkCoord(field, coord.row + 1, coord.column)
     ) {
       coordinates.push({
         column: coord.column,
@@ -214,10 +210,10 @@ export class PathFinder {
     return coordinates;
   }
 
-  private checkCoord(field: Field, column: number, row: number): boolean {
+  private checkCoord(field: Field, row: number, column: number): boolean {
     if (
-      field.getValue(column, row) === " " ||
-      field.getValue(column, row) === "O"
+      field.getValue(row, column) === " " ||
+      field.getValue(row, column) === "O"
     ) {
       return true;
     }
@@ -247,25 +243,26 @@ export class Field {
 
   public data: string[][];
 
-  public getValue(column: number, row: number) {
-    return this.data[column][row];
+  public getValue(row: number, column: number) {
+    return this.data[row][column];
   }
 
-  public maxColumn(): number {
+  public maxRow(): number {
     return this.data.length;
+  }
+
+  public minRow() {
+    return 0;
   }
 
   public minColumn() {
     return 0;
   }
 
-  public maxRow() {
+  public maxColumn() {
     return this.data[0].length;
   }
 
-  public minRow() {
-    return 0;
-  }
 }
 
 export class PathResult {
@@ -297,6 +294,11 @@ export class PathResult {
   }
 
   public isCoordinateNew(coord: Coordinates): boolean {
+    // for (int i = max - 1; i >= 0; i--)
+    // {
+    // }
+
+
     for (let index = 0; index < this.coordinates.length; index++) {
       const element = this.coordinates[index];
       if (element.column === coord.column && element.row === coord.row) {
